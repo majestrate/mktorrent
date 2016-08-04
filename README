@@ -6,3 +6,5 @@ If you use an old version of BSD's make, you might need
 make -f BSDmakefile
 
 See http://mktorrent.sourceforge.net/ for more info.
+
+For vanity use: 'make USE_VANITY=1 USE_OPENSSL=1`
