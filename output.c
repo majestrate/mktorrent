@@ -29,6 +29,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 #endif
 
 #include "mktorrent.h"
+#ifdef USE_VANITY
+#include "vanity.h"
+#endif
 
 #define EXPORT
 #endif /* ALLINONE */
@@ -124,7 +127,7 @@ EXPORT void write_metainfo(FILE *f, metafile_t *m, unsigned char *hash_string)
 
 	if (m->announce_list != NULL) {
 		/* write the announce URL */
-		fprintf(f, "8:announce%lu:%s",
+    fprintf(f, "8:announce%lu:%s",
 			(unsigned long)strlen(m->announce_list->l->s),
 			m->announce_list->l->s);
 		/* write the announce-list entry if we have
@@ -168,7 +171,13 @@ EXPORT void write_metainfo(FILE *f, metafile_t *m, unsigned char *hash_string)
 
 	if (m->source)
 		fprintf(f, "6:source%lu:%s", (unsigned long)strlen(m->source), m->source);
-
+#ifdef USE_VANITY
+  /* write the vanity cookie */
+  if (m->vcookie) {
+    fprintf(f, "6:vanity%lu:", (unsigned long)VCOOKIE_SIZE);
+    fwrite(m->vcookie, 1, (unsigned long)VCOOKIE_SIZE, f);
+  }
+#endif
 	/* end the info section */
 	fprintf(f, "e");
 

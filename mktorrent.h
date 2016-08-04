@@ -1,5 +1,6 @@
 #ifndef _MKTORRENT_H
 #define _MKTORRENT_H
+#include <stdlib.h>
 
 #ifdef _WIN32
 #define DIRSEP      "\\"
@@ -30,7 +31,7 @@ struct flist_s;
 typedef struct flist_s flist_t;
 struct flist_s {
 	char *path;
-	off_t size;
+	size_t size;
 	flist_t *next;
 };
 
@@ -50,9 +51,12 @@ typedef struct {
 #ifdef USE_PTHREADS
 	unsigned int threads;      /* number of threads used for hashing */
 #endif
-
+#ifdef USE_VANITY
+  char *vanity;              /* prefix for infohash to bruteforce */
+  char *vcookie;              /* vanity cookie, unique for our brute force */
+#endif
 	/* information calculated by read_dir() */
-	off_t size;                /* combined size of all files */
+	size_t size;                /* combined size of all files */
 	flist_t *file_list;        /* list of files and their sizes */
 	unsigned int pieces;       /* number of pieces */
 } metafile_t;

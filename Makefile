@@ -56,6 +56,9 @@
 # value is, so your number is probably better.
 #MAX_OPENFD = 100
 
+# enable vanity infohash bruteforce
+#USE_VANITY=1
+
 # Enable leftover debugging code.  Usually just spams you with lots of useless
 # information.
 #DEBUG = 1

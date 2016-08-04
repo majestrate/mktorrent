@@ -22,6 +22,10 @@ CFLAGS  ?= -O2 -Wall
 INSTALL ?= install
 PREFIX  ?= /usr/local
 
+ifdef USE_VANITY
+DEFINES += -DUSE_VANITY
+endif
+
 ifdef USE_PTHREADS
 DEFINES += -DUSE_PTHREADS
 SRCS := $(SRCS:hash.c=hash_pthreads.c)

@@ -275,6 +275,13 @@ static void print_help()
 	printf(
 	  "Usage: mktorrent [OPTIONS] <target directory or filename>\n\n"
 	  "Options:\n"
+#ifdef USE_VANITY
+#ifdef USE_LONG_OPTIONS
+    "--vanity=<prefix>            : try generating a vanity infohash\n"
+#else
+    "-V <prefix>       : try generating a vanity infohash\n"
+#endif
+#endif
 #ifdef USE_LONG_OPTIONS
 	  "-a, --announce=<url>[,<url>]* : specify the full announce URLs\n"
 	  "                                at least one is required\n"
@@ -424,6 +431,9 @@ EXPORT void init(metafile_t *m, int argc, char *argv[])
 #ifdef USE_PTHREADS
 		{"threads", 1, NULL, 't'},
 #endif
+#ifdef USE_VANITY
+    {"vanity", 0, NULL, 'V'},
+#endif
 		{"verbose", 0, NULL, 'v'},
 		{"web-seed", 1, NULL, 'w'},
 		{NULL, 0, NULL, 0}
@@ -432,9 +442,9 @@ EXPORT void init(metafile_t *m, int argc, char *argv[])
 
 	/* now parse the command line options given */
 #ifdef USE_PTHREADS
-#define OPT_STRING "a:c:dhl:n:o:ps:t:vw:"
+#define OPT_STRING "a:c:dhl:n:o:ps:t:vV:w:"
 #else
-#define OPT_STRING "a:c:dhl:n:o:ps:vw:"
+#define OPT_STRING "a:c:dhl:n:o:ps:vV:w:"
 #endif
 #ifdef USE_LONG_OPTIONS
 	while ((c = getopt_long(argc, argv, OPT_STRING,
@@ -492,6 +502,11 @@ EXPORT void init(metafile_t *m, int argc, char *argv[])
 		case 'v':
 			m->verbose = 1;
 			break;
+#ifdef USE_VANITY
+    case 'V':
+      m->vanity = optarg;
+      break;
+#endif
 		case 'w':
 			if (web_seed_last == NULL) {
 				m->web_seed_list = web_seed_last =
@@ -547,6 +562,17 @@ EXPORT void init(metafile_t *m, int argc, char *argv[])
 	}
 #endif
 
+#ifdef USE_VANITY
+  if (m->vanity) {
+    if (strlen(m->vanity) > 20) {
+      /* prefix is too big for sha1 */
+      fprintf(stderr, "prefix must be less than 20 chars\n");
+      exit(EXIT_FAILURE);
+    }
+    m->vcookie = NULL;
+  }
+#endif
+  
 	/* strip ending DIRSEP's from target */
 	strip_ending_dirseps(argv[optind]);
 

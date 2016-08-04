@@ -49,7 +49,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 #endif /* ALLINONE */
 
 #include "mktorrent.h"
-
+#ifdef USE_VANITY
+#include "vanity.c"
+#endif
 #ifdef ALLINONE
 #include "ftw.c"
 #include "init.c"
@@ -63,7 +65,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 #else
 #include "hash.c"
 #endif
-
 #include "output.c"
 #else /* ALLINONE */
 /* init.c */
@@ -132,6 +133,7 @@ static void close_file(FILE *f)
  */
 int main(int argc, char *argv[])
 {
+  unsigned char * h;
 	FILE *file;	/* stream for writing to the metainfo file */
 	metafile_t m = {
 		/* options */
@@ -166,8 +168,13 @@ int main(int argc, char *argv[])
 	   _after_ we did all the hashing in case we fail */
 	file = open_file(m.metainfo_file_path);
 
+  h = make_hash(&m);
+#ifdef USE_VANITY
+  if(m.vanity)
+    bruteforce_vanity(&m, h);
+#endif
 	/* calculate hash string and write the metainfo to file */
-	write_metainfo(file, &m, make_hash(&m));
+	write_metainfo(file, &m, h);
 
 	/* close the file stream */
 	close_file(file);
